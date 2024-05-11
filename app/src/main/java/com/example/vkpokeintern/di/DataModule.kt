@@ -15,12 +15,14 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class DataModule {
+object DataModule {
+    private const val BASE_URL = BuildConfig.BASE_URL
 //    TODO: provide retrofit, okhttp (for logging), bd, bd dao as singletons
 
     @Singleton
@@ -28,7 +30,8 @@ class DataModule {
     fun provideApiService(
         okHttpClient: OkHttpClient
     ): PokemonService = Retrofit.Builder()
-        .baseUrl("https://api.github.com/")
+        .baseUrl(BASE_URL)
+        .addConverterFactory(GsonConverterFactory.create())
         .client(okHttpClient)
         .build()
         .create()
@@ -42,7 +45,8 @@ class DataModule {
                     level = HttpLoggingInterceptor.Level.BODY
                 }
             }
-        ).build()
+        )
+        .build()
 
     @Singleton
     @Provides
@@ -52,7 +56,6 @@ class DataModule {
             AppDatabase::class.java,
         "pokemon-database"
         )
-        .addTypeConverter(Converter::class)
         .build()
 
     @Singleton

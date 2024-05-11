@@ -6,16 +6,16 @@ data class PokemonInfoResponse(
 
 data class PokemonResponse(
     val id: Long,
-    val abilities: List<AbilityInfoResponse>,
+    val abilities: List<AbilityInfoResponse>?,
     val baseExperience: Int,
-    val forms: List<UrlObject>,
+    val forms: List<UrlObject>?,
     val height: Int,
-    val locationAreaEncounters: String, // URL to area list, response in LocationAreasListResponse
-    val moves: List<MoveInfoResponse>,
+    val locationAreaEncounters: String?, // URL to area list, response in LocationAreasListResponse
+    val moves: List<MoveInfoResponse>?,
     val name: String,
-    val sprites: SpritesResponse,
-    val stats: List<Stat>,
-    val types: List<TypeInfoResponse>,
+    val sprites: SpritesResponse?,
+    val stats: List<Stat>?,
+    val types: List<TypeInfoResponse>?,
     val weight: Int
 )
 

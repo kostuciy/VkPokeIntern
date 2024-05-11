@@ -2,9 +2,11 @@ package com.example.vkpokeintern.repository
 
 import com.example.vkpokeintern.model.Ability
 import com.example.vkpokeintern.model.InfoObject
+import com.example.vkpokeintern.model.ListState
 import com.example.vkpokeintern.model.Location
 import com.example.vkpokeintern.model.Pokemon
 import com.example.vkpokeintern.model.Type
+import com.example.vkpokeintern.model.UrlHolder
 import kotlinx.coroutines.flow.Flow
 
 interface Repository {
@@ -15,54 +17,12 @@ interface Repository {
     val typeList: Flow<List<Type>>
 
 
-//    suspend fun getPokemonsInfo(
-//        limit: Int = 20,
-//        offset: Int = 0
-//    ): InfoObject
-//
-//    suspend fun getPokemonsInfo(
-//        url: String
-//    ): InfoObject
-//
-//    suspend fun getPokemon(url: String): Pokemon
-//
-//    suspend fun getAbilitiesInfo(
-//        limit: Int = 20,
-//        offset: Int = 0
-//    ): InfoObject
-//
-//    suspend fun getAbilitiesInfo(
-//        url: String
-//    ): InfoObject
-//
-//
-//    suspend fun getAbility(
-//        url: String
-//    ): Ability
-//
-//    suspend fun getPokemonLocationsInfo(
-//        url: String
-//    ): List<InfoObject>
-//
-//    suspend fun getLocationsInfo(
-//        limit: Int = 20,
-//        offset: Int = 0
-//    ): List<InfoObject>
-//
-//    suspend fun getLocationsInfo(
-//        url: String
-//    ): List<InfoObject>
-//
-//    suspend fun getLocation(
-//        url: String
-//    ): Location
-//
-//    suspend fun getTypesInfo(
-//        limit: Int = 20,
-//        offset: Int = 0
-//    ): InfoObject
-//
-//    suspend fun getTypesInfo(
-//        url: String
-//    ): InfoObject
+    suspend fun getPokemonsInfo(url: String? = null): ListState
+    suspend fun getAbilitiesInfo(url: String? = null): ListState
+    suspend fun getTypesInfo(url: String? = null): ListState
+    suspend fun getLocationsInfo(url: String? = null): ListState
+    suspend fun getPokemon(url: String)
+    suspend fun getAbility(url: String)
+    suspend fun getLocation(url: String)
+    suspend fun getType(url: String)
 }

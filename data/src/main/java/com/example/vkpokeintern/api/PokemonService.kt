@@ -2,13 +2,14 @@ package com.example.vkpokeintern.api
 
 import com.example.vkpokeintern.api.dto.AbilityResponse
 import com.example.vkpokeintern.api.dto.EncountersListResponse
-import com.example.vkpokeintern.api.dto.UrlObjectList
 import com.example.vkpokeintern.api.dto.LocationResponse
 import com.example.vkpokeintern.api.dto.PokemonResponse
+import com.example.vkpokeintern.api.dto.TypeResponse
+import com.example.vkpokeintern.api.dto.UrlObjectList
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface PokemonService {
 
@@ -16,63 +17,68 @@ interface PokemonService {
     suspend fun getPokemonsInfo(
         @Query("limit") limit: Int = 20,
         @Query("offset") offset: Int = 0
-    ) : Response<UrlObjectList>
+    ): Response<UrlObjectList>
 
-    @GET("{url}")
+    @GET
     suspend fun getPokemonsInfo(
-        @Path("url") url: String
-    ) : Response<UrlObjectList>
+        @Url url: String
+    ): Response<UrlObjectList>
 
-    @GET("{url}")
+    @GET
     suspend fun getPokemon(
-        @Path("url") url: String
-    ) : Response<PokemonResponse>
+        @Url url: String
+    ): Response<PokemonResponse>
 
     @GET("ability")
     suspend fun getAbilitiesInfo(
         @Query("limit") limit: Int = 20,
         @Query("offset") offset: Int = 0
-    ) : Response<UrlObjectList>
+    ): Response<UrlObjectList>
 
-    @GET("{url}")
+    @GET
     suspend fun getAbilitiesInfo(
-        @Path("url") url: String
-    ) : Response<UrlObjectList>
+        @Url url: String
+    ): Response<UrlObjectList>
 
-    @GET("{url}")
+    @GET
     suspend fun getAbility(
-        @Path("url") url: String
-    ) : Response<AbilityResponse>
+        @Url url: String
+    ): Response<AbilityResponse>
 
-    @GET("{url}")
+    @GET
     suspend fun getEncountersInfo(
-        @Path("url") url: String
-    ) : Response<EncountersListResponse>
+        @Url url: String
+    ): Response<EncountersListResponse>
 
     @GET("location-area")
     suspend fun getLocationsInfo(
         @Query("limit") limit: Int = 20,
         @Query("offset") offset: Int = 0
-    ) : Response<UrlObjectList>
+    ): Response<UrlObjectList>
 
-    @GET("{url}")
+    @GET
     suspend fun getLocationsInfo(
-        @Path("url") url: String
-    ) : Response<UrlObjectList>
+        @Url url: String
+    ): Response<UrlObjectList>
 
-    @GET("{url}")
+    @GET
     suspend fun getLocation(
-        @Path("url") url: String
-    ) : Response<LocationResponse>
+        @Url url: String
+    ): Response<LocationResponse>
 
     @GET("type")
     suspend fun getTypesInfo(
         @Query("limit") limit: Int = 20,
         @Query("offset") offset: Int = 0
-    ) : Response<UrlObjectList>
+    ): Response<UrlObjectList>
 
-    @GET("{url}")
+    @GET
     suspend fun getTypesInfo(
-        @Path("url") url: String
-    ) : Response<UrlObjectList>
+        @Url url: String
+    ): Response<UrlObjectList>
+
+    @GET
+    suspend fun getType(
+        @Url url: String
+    ): Response<TypeResponse>
 }

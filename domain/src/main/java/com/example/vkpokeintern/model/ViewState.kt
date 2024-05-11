@@ -1,4 +1,10 @@
 package com.example.vkpokeintern.model
 
-class ViewState {
+data class ViewState(
+    val state: ViewStateTypes = ViewStateTypes.LOADING
+) {
+
+    enum class ViewStateTypes {
+        LIST, LOADING, ERROR, REFRESHING
+    }
 }

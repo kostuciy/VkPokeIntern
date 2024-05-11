@@ -1,9 +1,13 @@
 package com.example.vkpokeintern.model
 
-class ListState(
-//    val pokemons
-//    val abilities
-//    val types
-//    val locations TODO()
+val EMPTY = ListState(
+    0, null, null, emptyList(), false
 )
-// TODO(): finish class
+
+data class ListState(
+    val size: Int,
+    val previous: String? = null,
+    val next: String? = null,
+    val list: List<UrlHolder>,
+    val filtered: Boolean = false
+)

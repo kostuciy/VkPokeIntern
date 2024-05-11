@@ -7,16 +7,30 @@ import com.example.vkpokeintern.api.dto.NameResponse
 import com.example.vkpokeintern.api.dto.PokemonResponse
 import com.example.vkpokeintern.api.dto.SpritesResponse
 import com.example.vkpokeintern.api.dto.TypeResponse
+import com.example.vkpokeintern.api.dto.UrlObject
+import com.example.vkpokeintern.api.dto.UrlObjectList
 import com.example.vkpokeintern.db.entity.AbilityEntity
 import com.example.vkpokeintern.db.entity.LocationEntity
 import com.example.vkpokeintern.db.entity.PokemonEntity
 import com.example.vkpokeintern.db.entity.TypeEntity
 import com.example.vkpokeintern.model.Ability
+import com.example.vkpokeintern.model.ListState
 import com.example.vkpokeintern.model.Location
 import com.example.vkpokeintern.model.Pokemon
 import com.example.vkpokeintern.model.Type
+import com.example.vkpokeintern.model.UrlHolder
 
 object EntityUtils {
+    fun toListState(urlObjectList: UrlObjectList, list: List<UrlHolder> = emptyList()): ListState =
+        ListState(
+            size = urlObjectList.count,
+            previous = urlObjectList.previous,
+            next = urlObjectList.next,
+            list = list
+        )
+
+    fun toUrlHolder(urlObject: UrlObject): UrlHolder =
+        UrlHolder(urlObject.name, urlObject.url)
 
     fun toPokemonModel(pokemonEntity: PokemonEntity): Pokemon =
         pokemonEntity.let {
@@ -47,27 +61,24 @@ object EntityUtils {
 
     fun toPokemonEntity(
         pokemonResponse: PokemonResponse,
-        encountersListResponse: EncountersListResponse,
-        locationsList: List<LocationResponse>
+        encountersListResponse: EncountersListResponse?,
     ): PokemonEntity =
         pokemonResponse.let {
-            val locationMap = locationsList.mapIndexed { index, location ->
-                toLocationEntity(location).locationName to encountersListResponse.locationArea[index].url
-            }.toMap()
             PokemonEntity(
                 pokemonId = it.id,
-                abilities = it.abilities.associate { abilityResponse ->
+                abilities = it.abilities?.associate { abilityResponse ->
                     abilityResponse.ability.name to abilityResponse.ability.url
-                },
+                } ?: emptyMap(),
                 baseExperience = it.baseExperience,
-                forms = it.forms.map { form -> form.name },
+                forms = it.forms?.map { form -> form.name } ?: emptyList(),
                 height = it.height,
-                pokemonLocations = locationMap,
-                moves = it.moves.map { move -> move.move.name },
+                pokemonLocations = encountersListResponse?.locationArea
+                    ?.associate { location -> location.name to location.url } ?: emptyMap(),
+                moves = it.moves?.map { move -> move.move.name } ?: emptyList(),
                 pokemonName = it.name,
-                sprites = spritesToList(it.sprites),
-                stats = it.stats.associate { stat -> stat.stat.name to stat.baseStat },
-                types = it.types.associate { type -> type.type.name to type.type.url },
+                sprites = it.sprites?.let { spritesToList(it) } ?: emptyList(),
+                stats = it.stats?.associate { stat -> stat.stat.name to stat.baseStat } ?: emptyMap(),
+                types = it.types?.associate { type -> type.type.name to type.type.url } ?: emptyMap(),
                 weight = it.weight
             )
         }
