@@ -41,7 +41,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation(libs.kotlin.reflect)
+    implementation(libs.javax.inject)
 
 //    Api
     implementation(libs.squareup.retrofit2.retrofit)
@@ -53,6 +54,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     annotationProcessor(libs.androidx.room.compiler)
     kapt(libs.androidx.room.compiler)
+
 //    Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

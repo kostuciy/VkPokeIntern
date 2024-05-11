@@ -1,15 +1,13 @@
 package com.example.vkpokeintern.db.entity
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.Relation
 
-@Entity
+@Entity(tableName = "locationentity")
 data class LocationEntity(
-    @PrimaryKey val id: Long,
-    val name: String,
-    val pokemons: Map<String, String> // name to url
+    @PrimaryKey val locationId: Long,
+    val locationName: String,
+    val locationPokemons: Map<String, String> // name to url
 )
 
 //data class LocationDetailed(

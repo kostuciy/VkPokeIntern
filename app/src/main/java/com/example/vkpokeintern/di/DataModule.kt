@@ -1,10 +1,16 @@
 package com.example.vkpokeintern.di
 
+import android.content.Context
+import androidx.room.Room
 import com.example.vkpokeintern.BuildConfig
 import com.example.vkpokeintern.api.PokemonService
+import com.example.vkpokeintern.db.AppDatabase
+import com.example.vkpokeintern.db.converters.Converter
+import com.example.vkpokeintern.db.dao.PokemonDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -37,5 +43,19 @@ class DataModule {
                 }
             }
         ).build()
-//
+
+    @Singleton
+    @Provides
+    fun provideRoomDb(@ApplicationContext applicationContext: Context): AppDatabase
+        = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+        "pokemon-database"
+        )
+        .addTypeConverter(Converter::class)
+        .build()
+
+    @Singleton
+    @Provides
+    fun provideDao(appDb: AppDatabase): PokemonDao = appDb.dao()
 }

@@ -1,21 +1,16 @@
-package com.example.vkpokeintern.db.entity
+package com.example.vkpokeintern.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity(tableName = "pokemonentity")
-data class PokemonEntity(
-    @PrimaryKey val pokemonId: Long,
+data class Pokemon(
+    val id: Long,
     val abilities: Map<String, String>, // name to url
     val baseExperience: Int,
     val forms: List<String>,
     val height: Int,
-    val pokemonLocations: Map<String, String>, // name to url
+    val locations: Map<String, String>, // name to url
     val moves: List<String>,
-    val pokemonName: String,
+    val name: String,
     val sprites: List<String>, // url, first non-null - avatar
     val stats: Map<String, Int>, // stat name to value
     val types: Map<String, String>, // name to url
     val weight: Int
-)
-
+) : Model

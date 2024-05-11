@@ -11,8 +11,39 @@ import com.example.vkpokeintern.db.entity.AbilityEntity
 import com.example.vkpokeintern.db.entity.LocationEntity
 import com.example.vkpokeintern.db.entity.PokemonEntity
 import com.example.vkpokeintern.db.entity.TypeEntity
+import com.example.vkpokeintern.model.Ability
+import com.example.vkpokeintern.model.Location
+import com.example.vkpokeintern.model.Pokemon
+import com.example.vkpokeintern.model.Type
 
 object EntityUtils {
+
+    fun toPokemonModel(pokemonEntity: PokemonEntity): Pokemon =
+        pokemonEntity.let {
+            Pokemon(
+                it.pokemonId, it.abilities, it.baseExperience, it.forms,
+                it.height, it.pokemonLocations, it.moves, it.pokemonName, it.sprites,
+                it.stats, it.types, it.weight
+                )
+        }
+
+    fun toAbilityModel(abilityEntity: AbilityEntity): Ability =
+        abilityEntity.let {
+            Ability(
+                it.abilityId, it.abilityName,
+                it.abilityEffects, it.abilityPokemons
+            )
+        }
+
+    fun toTypeModel(typeEntity: TypeEntity): Type =
+        typeEntity.let {
+            Type(it.typeId, it.typeName, it.pokemonsType)
+        }
+
+    fun toLocationModel(locationEntity: LocationEntity): Location =
+        locationEntity.let {
+            Location(it.locationId, it.locationName, it.locationPokemons)
+        }
 
     fun toPokemonEntity(
         pokemonResponse: PokemonResponse,
@@ -21,19 +52,19 @@ object EntityUtils {
     ): PokemonEntity =
         pokemonResponse.let {
             val locationMap = locationsList.mapIndexed { index, location ->
-                toLocationEntity(location).name to encountersListResponse.locationArea[index].url
+                toLocationEntity(location).locationName to encountersListResponse.locationArea[index].url
             }.toMap()
             PokemonEntity(
-                id = it.id,
+                pokemonId = it.id,
                 abilities = it.abilities.associate { abilityResponse ->
                     abilityResponse.ability.name to abilityResponse.ability.url
                 },
                 baseExperience = it.baseExperience,
                 forms = it.forms.map { form -> form.name },
                 height = it.height,
-                locations = locationMap,
+                pokemonLocations = locationMap,
                 moves = it.moves.map { move -> move.move.name },
-                name = it.name,
+                pokemonName = it.name,
                 sprites = spritesToList(it.sprites),
                 stats = it.stats.associate { stat -> stat.stat.name to stat.baseStat },
                 types = it.types.associate { type -> type.type.name to type.type.url },
@@ -46,9 +77,9 @@ object EntityUtils {
     ): LocationEntity =
         locationResponse.let {
             LocationEntity(
-                id = it.id,
-                name = getEnglishName(it.names)?.name ?: "error eng", // TODO: fix
-                pokemons = it.pokemonEncounters.associate { pokemon ->
+                locationId = it.id,
+                locationName = getEnglishName(it.names)?.name ?: "error eng", // TODO: fix
+                locationPokemons = it.pokemonEncounters.associate { pokemon ->
                     pokemon.pokemon.name to pokemon.pokemon.url
                 }
             )
@@ -59,12 +90,12 @@ object EntityUtils {
     ): AbilityEntity =
         abilityResponse.let {
             AbilityEntity(
-                id = it.id,
-                name = getEnglishName(it.names)?.name ?: "error eng", // TODO: fix
-                effects = it.effectEntries
+                abilityId = it.id,
+                abilityName = getEnglishName(it.names)?.name ?: "error eng", // TODO: fix
+                abilityEffects = it.effectEntries
                     .filter { effect -> effect.language.name == "en" }
                     .associate { effect -> effect.shortEffect to effect.effect },
-                pokemons = it.pokemon.associate { pokemon ->
+                abilityPokemons = it.pokemon.associate { pokemon ->
                     pokemon.pokemon.name to pokemon.pokemon.url
                 }
             )
@@ -75,9 +106,9 @@ object EntityUtils {
     ): TypeEntity =
         typeResponse.let {
             TypeEntity(
-                id = it.id,
-                name = getEnglishName(it.names)?.name ?: "error eng", // TODO: fix
-                pokemons = it.pokemon.associate { pokemon ->
+                typeId = it.id,
+                typeName = getEnglishName(it.names)?.name ?: "error eng", // TODO: fix
+                pokemonsType = it.pokemon.associate { pokemon ->
                     pokemon.pokemon.name to pokemon.pokemon.url
                 }
             )

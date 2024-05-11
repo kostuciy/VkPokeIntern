@@ -1,9 +1,11 @@
 package com.example.vkpokeintern.db.entity
 
+import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Entity(tableName = "typeentity")
 data class TypeEntity(
-    @PrimaryKey val id: Long,
-    val name: String,
-    val pokemons: Map<String, String> // name to url
+    @PrimaryKey val typeId: Long,
+    val typeName: String,
+    val pokemonsType: Map<String, String> // name to url
 )
