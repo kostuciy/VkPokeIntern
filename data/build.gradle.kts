@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
 
 //    Api
     implementation(libs.squareup.retrofit2.retrofit)

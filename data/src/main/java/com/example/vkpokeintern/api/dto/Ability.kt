@@ -7,8 +7,10 @@ data class AbilityInfoResponse(
 )
 
 data class AbilityResponse(
+    val id: Long,
     val effectEntries: List<AbilityEffectResponse>,
-    val pokemon: List<PokemonInfoResponse>
+    val pokemon: List<PokemonInfoResponse>,
+    val names: List<NameResponse>
 ) {
 
     data class AbilityEffectResponse(
