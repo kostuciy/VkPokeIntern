@@ -5,6 +5,6 @@ data class ViewState(
 ) {
 
     enum class ViewStateTypes {
-        LIST, LOADING, ERROR, REFRESHING
+        LIST, LOADING, ERROR
     }
 }

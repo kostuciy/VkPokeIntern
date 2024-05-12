@@ -7,13 +7,20 @@ import com.example.vkpokeintern.model.EMPTY
 import com.example.vkpokeintern.model.ListState
 import com.example.vkpokeintern.model.ModelType
 import com.example.vkpokeintern.model.ViewState
+import com.example.vkpokeintern.usecase.ClearAbilitiesUseCase
+import com.example.vkpokeintern.usecase.ClearLocationsUseCase
+import com.example.vkpokeintern.usecase.ClearPokemonsUseCase
+import com.example.vkpokeintern.usecase.ClearTypesUseCase
 import com.example.vkpokeintern.usecase.GetAbilityListStateUseCase
 import com.example.vkpokeintern.usecase.GetAbilityListUseCase
+import com.example.vkpokeintern.usecase.GetAbilityUseCase
 import com.example.vkpokeintern.usecase.GetLocationListStateUseCase
 import com.example.vkpokeintern.usecase.GetLocationListUseCase
+import com.example.vkpokeintern.usecase.GetLocationUseCase
 import com.example.vkpokeintern.usecase.GetPokemonListStateUseCase
 import com.example.vkpokeintern.usecase.GetPokemonListUseCase
 import com.example.vkpokeintern.usecase.GetPokemonUseCase
+import com.example.vkpokeintern.usecase.GetTypeUseCase
 import com.example.vkpokeintern.usecase.GetTypesListStateUseCase
 import com.example.vkpokeintern.usecase.GetTypesListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,7 +41,14 @@ class PokemonViewModel @Inject constructor(
     val getAbilityListStateUseCase: GetAbilityListStateUseCase,
     val getTypesListStateUseCase: GetTypesListStateUseCase,
     val getLocationListStateUseCase: GetLocationListStateUseCase,
-    val getPokemonUseCase: GetPokemonUseCase
+    val getPokemonUseCase: GetPokemonUseCase,
+    val getAbilityUseCase: GetAbilityUseCase,
+    val getLocationUseCase: GetLocationUseCase,
+    val getTypeUseCase: GetTypeUseCase,
+    val clearTypesUseCase: ClearTypesUseCase,
+    val clearPokemonsUseCase: ClearPokemonsUseCase,
+    val clearAbilitiesUseCase: ClearAbilitiesUseCase,
+    val clearLocationUseCase: ClearLocationsUseCase
 
 
     // usecases TODO()
@@ -77,12 +91,47 @@ class PokemonViewModel @Inject constructor(
         }
     }
 
-    fun changePage(
+    fun nextPage(listType: ModelType, startFilteringPage: Boolean = false) =
+        changePage(listType, PageOperationType.NEXT, startFilteringPage)
+
+    fun previousPage(listType: ModelType, startFilteringPage: Boolean = false) =
+        changePage(listType, PageOperationType.BACK, startFilteringPage)
+
+    private fun resetPage(listType: ModelType, startFilteringPage: Boolean = false) =
+        changePage(listType, PageOperationType.RESET, startFilteringPage)
+
+    fun exitPage(listType: ModelType) {
+        val listState = when (listType) {
+            ModelType.POKEMON -> _pokemonListState
+            ModelType.ABILITY -> _abilityListState
+            ModelType.TYPE -> _typeListState
+            ModelType.LOCATION -> _locationListState
+        }
+
+        if (listState.value.lastUnfilteredState != null) {
+            resetPage(listType)
+        }
+    }
+
+    fun reload(listType: ModelType) {
+        viewModelScope.launch {
+            try {
+                _viewState.value = ViewState(ViewState.ViewStateTypes.LOADING)
+                loadModels(listType)
+                _viewState.value = ViewState(ViewState.ViewStateTypes.LIST)
+            } catch(e: Exception) {
+                _viewState.value = ViewState(ViewState.ViewStateTypes.ERROR)
+            }
+        }
+    }
+
+    private fun changePage(
         listType: ModelType,
-        operation: PageOperationType = PageOperationType.RESET
+        operation: PageOperationType = PageOperationType.RESET,
+        startFilteringPage: Boolean = false
     ) {
         viewModelScope.launch {
-//            try { TODO: remove comm
+            try {
                 _viewState.value = ViewState(ViewState.ViewStateTypes.LOADING)
 
                 val listState = when (listType) {
@@ -91,66 +140,111 @@ class PokemonViewModel @Inject constructor(
                     ModelType.LOCATION -> _locationListState.value
                     ModelType.TYPE -> _typeListState.value
                 }
+
                 val url = when (operation) {
                     PageOperationType.NEXT -> listState.next ?: return@launch
                     PageOperationType.BACK -> listState.previous ?: return@launch
-                    PageOperationType.RESET -> null
-                }
-                when (listType) {
-                    ModelType.POKEMON ->
-                        _pokemonListState.value = getPokemonListStateUseCase.execute(url)
-                    ModelType.ABILITY ->
-                        _abilityListState.value = getAbilityListStateUseCase.execute(url)
-                    ModelType.TYPE ->
-                        _typeListState.value = getTypesListStateUseCase.execute(url)
-                    ModelType.LOCATION ->
-                        _locationListState.value = getLocationListStateUseCase.execute(url)
+                    PageOperationType.RESET -> listState.lastUnfilteredState
                 }
 
+                getNewState(
+                    listType,
+                    startFilteringPage,
+                    operation == PageOperationType.RESET,
+                    url
+                )
                 loadModels(listType)
 
                 _viewState.value = ViewState(ViewState.ViewStateTypes.LIST)
-//            } catch (e: Exception) {
-//                _viewState.value = ViewState(ViewState.ViewStateTypes.ERROR)
-//            }
+            } catch (e: Exception) {
+                _viewState.value = ViewState(ViewState.ViewStateTypes.ERROR)
+            }
         }
     }
 
-    private suspend fun removeModels(modelType: ModelType) {
-        // TODO()
+    private suspend fun getNewState(
+        listType: ModelType,
+        startFilteringPage: Boolean,
+        isResetting: Boolean,
+        url: String?,
+    ) {
+        when (listType) {
+            ModelType.POKEMON ->
+                _pokemonListState.value = getPokemonListStateUseCase.execute(url).copy(
+                    lastUnfilteredState = getNewLastUnfiltered(
+                        startFilteringPage,
+                        _pokemonListState.value.lastUnfilteredState,
+                        url, isResetting
+                    )
+                )
+            ModelType.ABILITY ->
+                _abilityListState.value = getAbilityListStateUseCase.execute(url).copy(
+                    lastUnfilteredState = getNewLastUnfiltered(
+                        startFilteringPage,
+                        _abilityListState.value.lastUnfilteredState,
+                        url, isResetting
+                    )
+                )
+            ModelType.TYPE ->
+                _typeListState.value = getTypesListStateUseCase.execute(url).copy(
+                    lastUnfilteredState = getNewLastUnfiltered(
+                        startFilteringPage,
+                        _typeListState.value.lastUnfilteredState,
+                        url, isResetting
+                    )
+                )
+            ModelType.LOCATION ->
+                _locationListState.value = getLocationListStateUseCase.execute(url).copy(
+                    lastUnfilteredState = getNewLastUnfiltered(
+                        startFilteringPage,
+                        _locationListState.value.lastUnfilteredState,
+                        url, isResetting
+                    )
+                )
+        }
     }
+
+    private fun getNewLastUnfiltered(
+        startFilteringPage: Boolean,
+        lastUnfiltered: String?,
+        newUrl: String?,
+        isResetting: Boolean
+    ): String? =
+        when {
+            isResetting || newUrl == null -> null
+            startFilteringPage -> newUrl
+            lastUnfiltered != null -> lastUnfiltered
+            else -> null
+        }
+
 
     private suspend fun loadModels(modelType: ModelType) {
         when (modelType) {
                 ModelType.POKEMON -> {
                     val pokemonHolders = pokemonListState.value.list
                     Log.d("repository_tag", "${pokemonHolders}")
-                    withContext(Dispatchers.IO) {
-                        pokemonHolders.forEach {
-                            Log.d("repository_tag", "${it.url}")
-                            getPokemonUseCase.execute(it.url)
-                        }
-                    }
+                    clearPokemonsUseCase.execute()
+                    getPokemonUseCase.execute(pokemonHolders.map { it.url })
                 }
                 ModelType.ABILITY -> {
                     val abilityHolders = abilityListState.value.list
                     withContext(Dispatchers.IO) {
-//                        abilityHolders.forEach { getAbilityUseCase.execute(it.url) }
-//                        TODO()
+                        clearAbilitiesUseCase.execute()
+                        abilityHolders.forEach { getAbilityUseCase.execute(it.url) }
                     }
                 }
                 ModelType.TYPE -> {
                     val typeHolders = typeListState.value.list
                     withContext(Dispatchers.IO) {
-//                        typeHolders.forEach { getTypeUseCase.execute(it.url) }
-//                        TODO()
+                        clearTypesUseCase.execute()
+                        typeHolders.forEach { getTypeUseCase.execute(it.url) }
                     }
                 }
                 ModelType.LOCATION -> {
                     val locationHolders = locationListState.value.list
                     withContext(Dispatchers.IO) {
-//                        locationHolders.forEach { getLocationUseCase.execute(it.url) }
-//                        TODO()
+                        clearLocationUseCase.execute()
+                        locationHolders.forEach { getLocationUseCase.execute(it.url) }
                     }
                 }
             }

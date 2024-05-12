@@ -2,11 +2,10 @@ package com.example.vkpokeintern.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.data.api.PokemonService
+import com.example.data.db.AppDatabase
+import com.example.data.db.dao.PokemonDao
 import com.example.vkpokeintern.BuildConfig
-import com.example.vkpokeintern.api.PokemonService
-import com.example.vkpokeintern.db.AppDatabase
-import com.example.vkpokeintern.db.converters.Converter
-import com.example.vkpokeintern.db.dao.PokemonDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -66,10 +66,11 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
 
-//    Api
+//    Network
     implementation(libs.squareup.retrofit2.retrofit)
     implementation(libs.squareup.retrofit2.converter.gson)
     implementation(libs.squareup.okhttp3.logging.interceptor)
+    implementation(libs.glide)
 
     //    Local db
     implementation(libs.androidx.room.runtime)

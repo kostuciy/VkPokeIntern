@@ -1,7 +1,7 @@
 package com.example.vkpokeintern.model
 
 val EMPTY = ListState(
-    0, null, null, emptyList(), false
+    0, null, null, emptyList(), null
 )
 
 data class ListState(
@@ -9,5 +9,5 @@ data class ListState(
     val previous: String? = null,
     val next: String? = null,
     val list: List<UrlHolder>,
-    val filtered: Boolean = false
+    val lastUnfilteredState: String? = null,
 )
